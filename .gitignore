@@ -4,5 +4,11 @@ __pycache__/
 .venv/
 venv/
 env/
-results/
+results/*
+!results/
+!results/received.txt
+!results/metrics.json
+!results/constellation.png
+!results/ber_curve.png
+!results/sync_peak.png
 *.log

@@ -1,0 +1,17 @@
+{
+  "ber": 0.0,
+  "channel": "awgn",
+  "checksum_pass": true,
+  "coded_payload_bits": 18384,
+  "failure_reason": "",
+  "fer": 0.0,
+  "frame_bits": 18544,
+  "modulation": "qpsk",
+  "payload_bits": 6128,
+  "seed": 2026,
+  "snr_db": 12.0,
+  "sync_error_symbols": 0,
+  "sync_start_index": 109,
+  "sync_true_offset": 109,
+  "text_match_rate": 1.0
+}
