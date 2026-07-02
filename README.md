@@ -127,3 +127,59 @@ pytest public_tests -q
 ```text
 2023123456-张三-无线通信期末项目
 ```
+
+## Final Submission Usage Notes
+
+Required AWGN grading command:
+
+```bash
+python main.py --input Test.txt --output results/received.txt --snr 12 --seed 2026 --mod qpsk --channel awgn
+```
+
+Optional Level 3 Rayleigh demonstration:
+
+```bash
+python main.py --input Test.txt --output results/rayleigh_received.txt --snr 18 --seed 2026 --mod qpsk --channel rayleigh
+```
+
+Optional GUI demonstration:
+
+```bash
+python gui.py
+```
+
+Test commands:
+
+```bash
+python -m pytest public_tests -q
+python -m pytest tests -q
+```
+
+Important outputs:
+
+```text
+results/received.txt
+results/metrics.json
+results/constellation.png
+results/ber_curve.png
+results/system_ber_curve.png
+results/sync_peak.png
+results/rayleigh_received.txt
+results/rayleigh_metrics.json
+```
+
+Design summary:
+
+- The default grading path remains `main.py` with AWGN and QPSK.
+- The receiver uses UTF-8 source coding, PN XOR scrambling, repetition channel coding, frame length fields, CRC/checksum, QPSK Gray mapping, AWGN/Rayleigh channel simulation, preamble synchronization, demodulation, decoding, descrambling, and UTF-8 recovery.
+- `raw_payload_length` means the source-encoded payload bit count before scrambling and channel coding; it is used to remove padding safely.
+- Synchronization uses preamble correlation followed by checksum-assisted candidate search around the coarse peak.
+- Rayleigh mode is a course-level flat-fading extension: `y = h*x + n`, preamble-based channel estimation, and one-tap equalization.
+- `gui.py` is only an optional Level 3 demo tool and does not replace the CLI grading entry point.
+
+BER curve notes:
+
+- `results/ber_curve.png` contains the uncoded QPSK reference BER curve and the end-to-end repetition-coded system BER overlay.
+- `results/system_ber_curve.png` contains only the complete end-to-end system BER-SNR curve.
+- The system BER curve is computed by running the full pipeline over multiple SNR values and seeds, including source coding, scrambling, repetition coding, framing, QPSK, AWGN, synchronization, decoding, descrambling, source decoding, and checksum/metrics calculation.
+- The BER sweep uses temporary outputs and does not overwrite the formal `results/received.txt` or final `results/metrics.json`.

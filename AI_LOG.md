@@ -2,7 +2,17 @@
 
 ## Current Stage
 
-Phase 1: design-document stage.
+Final Level 3 submission hardening and verification completed.
+
+The project now includes the implemented CLI pipeline, source modules, tests, results artifacts, Level 3 Rayleigh extension, preamble-based one-tap equalization, optional Tkinter GUI, and both QPSK reference and end-to-end system BER visualizations. Earlier Phase 1/2/3 entries are retained below as the chronological AI-assisted development record.
+
+Current final verification:
+
+- `python -m pytest public_tests -q`: `22 passed`.
+- `python -m pytest tests -q`: `27 passed` after the system BER curve regression tests were added.
+- Fixed AWGN CLI run: `text_match_rate=1.0`, `checksum_pass=true`, `ber=0.0`.
+
+Historical initial stage record: Phase 1 design-document stage.
 
 This stage creates or updates only:
 
@@ -737,3 +747,224 @@ Git status expectation:
 Commit readiness:
 
 - The repository is ready for user review and a commit after final confirmation.
+
+## Level 3 Cleanup and Finalization
+
+Current stage:
+
+- Level 3 Rayleigh copy cleanup and finalization.
+- Work was performed only in `wireless-final-project-template-level3`.
+- The original Level 2 stable directory was not modified.
+
+User prompt summary:
+
+- Restore `Test.txt` after public-test side effects.
+- Re-run the default AWGN validation command.
+- Re-run the Rayleigh demonstration and save Rayleigh metrics separately.
+- Restore final default AWGN `results/metrics.json` and `results/received.txt`.
+- Run local tests and public tests without weakening or skipping tests.
+- Confirm the Level 3 copy is ready as a final submission candidate, without pushing or merging.
+
+Actions performed:
+
+- Restored `Test.txt` with `git checkout -- Test.txt`.
+- Re-ran the AWGN fixed command:
+  `python main.py --input Test.txt --output results/received.txt --snr 12 --seed 2026 --mod qpsk --channel awgn`.
+- Re-ran the Rayleigh demonstration:
+  `python main.py --input Test.txt --output results/rayleigh_received.txt --snr 18 --seed 2026 --mod qpsk --channel rayleigh`.
+- Saved Rayleigh metrics to `results/rayleigh_metrics.json`.
+- Re-ran the AWGN fixed command again so final `results/metrics.json` and `results/received.txt` are AWGN outputs.
+- Ran `python -m pytest tests -q`.
+- Ran `python -m pytest public_tests -q` in a temporary sandbox copy to avoid modifying the working copy `Test.txt`.
+- Updated `.gitignore` so `results/rayleigh_received.txt` and `results/rayleigh_metrics.json` are visible as candidate submission artifacts.
+- Updated `DESIGN.md` and `TEST_PLAN.md` with the optional Level 3 Rayleigh extension and cleanup verification notes.
+
+Verification results:
+
+- Final AWGN command exited successfully.
+- Final AWGN `results/received.txt` matches `Test.txt` exactly.
+- Final `results/metrics.json` has `channel=awgn`, `text_match_rate=1.0`, `checksum_pass=true`, and `ber=0.0`.
+- Rayleigh demonstration exited successfully.
+- `results/rayleigh_received.txt` matches `Test.txt` exactly.
+- `results/rayleigh_metrics.json` has `channel=rayleigh`, `text_match_rate=1.0`, `checksum_pass=true`, and `ber=0.0`.
+- Local tests: `20 passed`.
+- Public tests in sandbox: `22 passed`.
+
+Final status summary:
+
+- `Test.txt` is restored and not listed as modified.
+- `public_tests/` is not listed as modified.
+- `requirements.txt` is not listed as modified.
+- Current candidate changes are `.gitignore`, `DESIGN.md`, `TEST_PLAN.md`, `main.py`, `src/channel.py`, `src/pipeline.py`, `tests/test_rayleigh.py`, `results/rayleigh_received.txt`, and `results/rayleigh_metrics.json`.
+- Existing AWGN result files are present, with final `results/metrics.json` set to AWGN.
+
+Recommendation:
+
+- The Level 3 copy is a reasonable final submission candidate after user review.
+- Do not push or merge automatically; wait for explicit confirmation.
+
+## Level 3 GUI Extension
+
+Current stage:
+
+- Optional GUI add-on for the Level 3 copy.
+- Work was performed only in `wireless-final-project-template-level3`.
+- The original Level 2 stable directory was not modified.
+
+User prompt summary:
+
+- Add a Tkinter GUI that can run the existing simulation without changing the CLI or communication chain.
+- Keep AWGN as the default grading path.
+- Allow channel selection for AWGN and Rayleigh.
+- Display metrics and generated plots for presentation.
+
+Implementation notes:
+
+- Added `gui.py`.
+- The GUI calls `src.pipeline.run_pipeline(...)` directly.
+- Default GUI values match the fixed AWGN grading command.
+- The GUI displays `channel`, `snr_db`, `seed`, `ber`, `fer`, `text_match_rate`, `checksum_pass`, and `sync_start_index`.
+- The GUI checks whether the recovered output text exactly matches the input text.
+- The GUI loads `constellation.png`, `ber_curve.png`, and `sync_peak.png` from the selected output directory.
+- `main.py`, public tests, and the base pipeline API were not changed for the GUI.
+- No dependency was added to `requirements.txt`.
+
+Verification:
+
+- `python -m py_compile gui.py`: passed.
+- Hidden Tkinter initialization check: passed with default `channel=awgn`, `snr=12`, and `seed=2026`.
+- `python -m pytest tests -q`: `20 passed`.
+- Fixed AWGN CLI command: exited successfully; `results/received.txt` matches `Test.txt`; final `results/metrics.json` has `channel=awgn`, `text_match_rate=1.0`, `checksum_pass=true`, and `ber=0.0`.
+- `python -m pytest public_tests -q` in a temporary sandbox copy: `22 passed`.
+
+Recommendation:
+
+- Use the GUI for demonstration and screenshots.
+- Keep CLI as the official grading entry point.
+
+## Level 3 Final Submission Hardening
+
+User prompt summary:
+
+- Harden the Level 3 copy before final submission without breaking the official CLI.
+- Fix a hidden-test style synchronization failure observed with `seed=126`, true offset `39`, and a coarse peak outside the old `+/-3` search range.
+- Replace ideal Rayleigh CSI equalization with preamble-based flat-channel estimation and one-tap equalization.
+- Keep `gui.py` optional and isolated from automated grading.
+- Update README, DESIGN, MOCK test report, AI log, and tests.
+- Remove cache files and keep public tests and `requirements.txt` unchanged.
+
+Files changed by AI:
+
+- `src/pipeline.py`: expanded checksum-assisted sync search to `+/-32`; added Rayleigh preamble channel estimation; added diagnostic metrics.
+- `src/channel.py`: clarified Rayleigh docstring so true fading is diagnostic only.
+- `tests/test_level3_hardening.py`: added regression tests for `seed=126`, multi-seed Chinese UTF-8, low SNR, Rayleigh CLI, GUI import safety, and metrics fields.
+- `tests/test_rayleigh.py`: updated Rayleigh assertions to require `equalization=preamble_one_tap`.
+- `DESIGN.md`, `TEST_PLAN.md`, `MOCK_TEST_REPORT.md`, `README.md`, and this `AI_LOG.md`: documented final Level 3 behavior.
+
+Adoption rationale:
+
+- The synchronization change preserves the public `synchronize(...)` API while making the receiver robust to nearby preamble-correlation ambiguity.
+- CRC/checksum is the correct course-level discriminator because it validates the recovered original payload, not only the correlation peak.
+- Rayleigh now uses a defensible receiver model: known preamble symbols estimate a single flat-fading coefficient, then one-tap equalization compensates it.
+- The official `main.py` CLI remains unchanged because it is the grading contract.
+- The GUI remains a Level 3 optional demo tool; it imports `run_pipeline(...)` and does not participate in automatic scoring.
+
+Test failure and fix process:
+
+- A direct regression probe confirmed the prior risk: the old narrow candidate window could miss the true frame start.
+- After widening the candidate search and selecting by checksum, `seed=126` recovers with `sync_start_index=39`, `sync_true_offset=39`, `checksum_pass=true`, and `ber=0.0`.
+- Rayleigh at `snr=18`, `seed=2026` recovers with `equalization=preamble_one_tap` and records channel-estimation diagnostics.
+- Low SNR is handled as a metrics-producing receiver outcome rather than an unhandled crash.
+
+Final verification:
+
+- `python -m pytest tests -q`: `25 passed`.
+- Fixed AWGN CLI command: exited successfully; `results/received.txt` matches `Test.txt`; final `results/metrics.json` has `channel=awgn`, `text_match_rate=1.0`, `checksum_pass=true`, `ber=0.0`, `sync_start_index=109`, `sync_true_offset=109`, and `sync_error_symbols=0`.
+- Rayleigh demo command: exited successfully; `results/rayleigh_received.txt` matches `Test.txt`; saved `results/rayleigh_metrics.json` with `channel=rayleigh`, `equalization=preamble_one_tap`, `text_match_rate=1.0`, `checksum_pass=true`, and `ber=0.0`.
+- `python -m pytest public_tests -q` in a temporary sandbox copy: `22 passed`.
+- Cache cleanup removed `__pycache__/` and `.pytest_cache/`; `.gitignore` already excludes `__pycache__/`, `*.py[cod]`, and `.pytest_cache/`.
+
+Final recommendation:
+
+- Use this Level 3 copy as the final submission candidate after user review.
+- Do not push or merge automatically.
+
+## End-to-End System BER Curve Extension
+
+User prompt summary:
+
+- Add a complete repetition-coded end-to-end BER-SNR curve.
+- Preserve the original CLI, public tests, GUI, and existing formal result outputs.
+- Keep `results/ber_curve.png` as the reference curve or combined curve.
+- Add `results/system_ber_curve.png` from full pipeline runs.
+- Do not let the BER sweep overwrite formal `results/received.txt` or final `results/metrics.json`.
+
+Implementation notes:
+
+- Added `compute_system_ber_curve(...)` in `src.pipeline`.
+- Added `generate_plot_files` and `include_system_ber_curve` optional flags to `run_pipeline(...)` so sweep runs do not recurse into plotting.
+- The sweep uses SNR values `[0, 2, 4, 6, 8, 10, 12, 14]` and seeds `[2026, 2027, 2028]`.
+- Sweep runs call the same full pipeline path with temporary outputs and plot generation disabled.
+- `results/ber_curve.png` now overlays uncoded QPSK reference and end-to-end repetition-coded system BER.
+- `results/system_ber_curve.png` is generated as the dedicated full-system BER plot.
+- `metrics.json` now includes `ber_curve_type`, `system_ber_curve_path`, `system_ber_snr_values`, `system_ber_values`, `system_ber_seeds`, and aggregate pass-rate fields.
+- GUI plot tabs now include `system_ber_curve.png`.
+
+Performance note:
+
+- The official run keeps robust `sync_search_radius=32`.
+- Internal BER sweep uses a smaller temporary sync search radius to keep the public-test CLI runtime below the 20-second timeout while still exercising synchronization, demodulation, decoding, descrambling, and checksum/metrics calculation.
+
+Final verification:
+
+- `python -m pytest tests -q`: `27 passed`.
+- `python -m pytest public_tests -q` in a temporary sandbox copy: `22 passed`.
+- Fixed AWGN CLI command exited successfully.
+- `results/received.txt` matches `Test.txt` exactly.
+- `results/metrics.json` remains the formal AWGN result with `channel=awgn`, `text_match_rate=1.0`, `checksum_pass=true`, and `ber=0.0`.
+- `results/metrics.json` includes `system_ber_curve_path=results/system_ber_curve.png`, 8 SNR points, and seeds `[2026, 2027, 2028]`.
+- Generated non-empty plots: `constellation.png`, `ber_curve.png`, `system_ber_curve.png`, and `sync_peak.png`.
+
+## Final Documentation Consistency Cleanup
+
+User prompt summary:
+
+- Review `DESIGN.md`, `TEST_PLAN.md`, `MOCK_TEST_REPORT.md`, and `AI_LOG.md` for final submission consistency.
+- Remove misleading Phase 1-only wording from the top of final documents.
+- Preserve RED/GREEN TDD history while clarifying that early failures were intentional process records.
+- Align Rayleigh documentation with preamble-based channel estimation and one-tap equalization.
+- Clarify that the GUI is optional and does not affect CLI grading.
+- Clarify the difference between the QPSK reference BER curve and the end-to-end repetition-coded system BER curve.
+
+AI changes:
+
+- Updated final status statements in `DESIGN.md`, `TEST_PLAN.md`, `MOCK_TEST_REPORT.md`, and `AI_LOG.md`.
+- Replaced outdated implementation-status wording near the tops of final documents.
+- Added final verification summaries and current test results.
+- Corrected Rayleigh receiver descriptions from ideal true-`h` equalization to preamble-estimated `h_hat` equalization.
+- Added GUI testing and optional-display explanation.
+- Added BER visualization documentation where applicable.
+
+Human adoption rationale:
+
+- The code was already in a final Level 3 state, but several documents still looked like early Phase 1 or RED-stage artifacts.
+- The cleanup prevents graders from misreading historical TDD failures as current failures.
+- The updated Rayleigh and BER descriptions better match the implemented system and improve answer quality for oral defense.
+
+## End-to-End System BER Curve Update
+
+User prompt summary:
+
+- Add a complete repetition-coded end-to-end BER-SNR curve in addition to the existing QPSK reference BER curve.
+
+AI changes:
+
+- Added and documented system BER sweep logic that runs the full pipeline over multiple SNR values and seeds.
+- Generated and documented `results/system_ber_curve.png`.
+- Preserved the official `results/received.txt` and `results/metrics.json` for the fixed AWGN grading command.
+- Updated tests and documentation to distinguish the uncoded QPSK reference BER curve from the end-to-end repetition-coded system BER curve.
+
+Adoption rationale:
+
+- The reference BER curve explains modulation-layer behavior.
+- The system BER curve better reflects the actual coded file-transmission chain.

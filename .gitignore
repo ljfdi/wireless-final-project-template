@@ -8,7 +8,11 @@ results/*
 !results/
 !results/received.txt
 !results/metrics.json
+!results/rayleigh_received.txt
+!results/rayleigh_metrics.json
 !results/constellation.png
 !results/ber_curve.png
+!results/system_ber_curve.png
 !results/sync_peak.png
 *.log
+~$*

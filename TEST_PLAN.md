@@ -1,12 +1,16 @@
 # Wireless Final Project Test Plan
 
-## 1. Scope and Phase Boundary
+## 1. Scope and Final Verification Status
 
-This document defines the testing strategy for the wireless communication final project. It is created during Phase 1, the design-document stage.
+This document defines the testing strategy and final verification record for the wireless communication final project. The project has completed the required AWGN/QPSK baseline, the Level 2 plots and documentation workflow, and the Level 3 Rayleigh, GUI, and end-to-end system BER curve extensions.
 
-Phase 1 only creates or updates planning documents. It does not create `main.py`, `src/`, `tests/`, or `results/`, and it does not implement Python business code.
+The earlier Phase 1/Phase 2 entries are preserved as process records for the required PRD -> DESIGN -> TEST_PLAN -> MOCK_TEST_REPORT -> implementation workflow. The final implementation now includes `main.py`, `src/`, `tests/`, and generated `results/` artifacts.
 
-Phase 2 will create mock tests and begin the TDD RED stage. Production implementation should start only after the relevant failing tests have been written and observed to fail for the expected reason.
+Final hardening result:
+
+- `python -m pytest public_tests -q`: `22 passed`.
+- `python -m pytest tests -q`: `27 passed` after the system BER curve regression tests were added. Earlier `25 passed` entries are historical records from before the system BER extension.
+- Fixed AWGN CLI run: `text_match_rate=1.0`, `checksum_pass=true`, `ber=0.0`.
 
 ## 2. Test Environment and Commands
 
@@ -32,9 +36,9 @@ GitHub Actions will run public tests in Python 3.11 and install dependencies fro
 
 ## 3. Mock Test Plan
 
-Mock tests will be written in Phase 2 before production code. Their purpose is to validate the design assumptions before full implementation.
+Mock tests were written in Phase 2 before production code. Their purpose was to validate the design assumptions before full implementation. The RED results are historical TDD process records, not the current final status.
 
-Planned mock tests:
+Historical mock test coverage:
 
 | Mock test | Purpose | Expected result |
 |---|---|---|
@@ -43,7 +47,7 @@ Planned mock tests:
 | AWGN and synchronization mock | Verify a known QPSK preamble can be detected after offsets 0, 1, 25, 64, and 128 at SNR 12 dB | `synchronize(...)` returns an integer start index within tolerance |
 | Low-SNR failure mock | Verify low SNR produces metrics and does not crash even if checksum fails | Program records failure indicators |
 
-Mock results will later be summarized in `MOCK_TEST_REPORT.md`, including at least one design risk or defect and any DESIGN.md revisions.
+Mock results are summarized in `MOCK_TEST_REPORT.md` as historical RED/GREEN process records, including discovered risks, synchronization refinement, Rayleigh revision, GUI verification, and final hardening notes.
 
 ## 4. Unit Test Plan
 
@@ -207,11 +211,11 @@ Expected:
 
 The public tests check the following areas, so implementation and documentation must align with them:
 
-| Public area | Planned coverage |
+| Public area | Coverage |
 |---|---|
-| Required files | Phase 1 creates docs; later phases create `main.py`, `src/`, `tests/`, `results/` |
+| Required files | Final implementation includes docs, `main.py`, `src/`, `tests/`, and generated `results/` |
 | DESIGN.md fixed chain | This document explicitly names Source Encode, Encrypt/Scramble, Channel Encode, Frame Build, QPSK Modulate/Demodulate, Channel, Synchronization, Channel Decode, Source Decode, Metrics |
-| MOCK_TEST_REPORT.md | Phase 3 will summarize mock tests, risks, and design revisions |
+| MOCK_TEST_REPORT.md | Records mock tests, RED/GREEN process, discovered risks, synchronization fix, Rayleigh revision, GUI verification, and system BER curve addendum |
 | UTF-8 codec | Unit tests for source round-trip |
 | Frame fields | Unit tests for preamble, length, payload, checksum/CRC |
 | Scramble/encrypt | Unit tests for PN XOR reversibility |
@@ -227,7 +231,7 @@ The public tests check the following areas, so implementation and documentation 
 
 ## 7. Hidden Tests Risk Plan
 
-Hidden tests may use broader cases than public tests. Planned risk tests:
+Hidden tests may use broader cases than public tests. Hidden-test risk checks:
 
 - Different Chinese UTF-8 texts and lengths.
 - Different seeds, verifying reproducible AWGN and PN scrambling per seed.
@@ -250,16 +254,18 @@ Manual and automated checks should verify:
 - No bypass that writes decoded text before the receive chain completes.
 - Metrics are computed from actual run data.
 
-## 9. Phase 2 Entry Criteria
+## 9. Historical Phase 2 Entry Criteria
 
-Before Phase 2 starts:
+This section is preserved as a historical workflow record from the early PRD -> DESIGN -> TEST_PLAN -> MOCK_TEST_REPORT process. It is not the current project status.
+
+At the historical Phase 2 entry point:
 
 - `DESIGN.md`, `TEST_PLAN.md`, and `AI_LOG.md` have been created or updated.
 - The user confirms Phase 2.
 - Mock tests are written first.
 - TDD RED is observed before production implementation.
 
-Phase 2 should stop after mock/TDD RED tasks unless the user explicitly approves moving into implementation.
+At that historical stage, Phase 2 was designed to stop after mock/TDD RED tasks unless the user explicitly approved moving into implementation. The final implementation has since been completed and verified.
 
 ## 10. Phase 3 Review Notes
 
@@ -267,7 +273,9 @@ Phase 3 reviewed the RED mock results against `DESIGN.md`, `TEST_PLAN.md`, and t
 
 No test changes are required. The only design clarification is that `build_frame` may accept compatibility aliases (`payload_length`, `checksum_bits`) while preserving the primary `raw_payload_length` and `checksum` semantics, and `parse_frame` should return dict-like metadata to make frame fields easy to inspect.
 
-## 11. Phase 5 Final Verification Summary
+## 11. Historical Phase 5 Verification Summary
+
+This section is preserved as a historical process record from the first full GREEN verification. It predates later Level 3 hardening and system BER curve tests; the current final verification status is recorded in Section 1.
 
 Phase 5 regenerated the final required outputs with the fixed command:
 
@@ -319,3 +327,83 @@ Final anti-copy and anti-hardcoding checks:
 - Static scan found no embedded chunk of the current `Test.txt` content.
 - Metrics and plots are generated from the actual pipeline run rather than hardcoded fixed outputs.
 - `results/received.txt` is written after receiver decoding, not by direct file copy.
+
+## 12. Level 3 Rayleigh Extension Verification
+
+The Level 3 copy adds `--channel rayleigh` as an optional extension. AWGN remains the default grading path and the required command must continue to pass unchanged.
+
+Additional checks:
+
+- Rayleigh channel output is reproducible with the same `seed`.
+- Rayleigh mode uses block-flat fading: `y = h*x + n`.
+- The receiver does not use the true simulated `h` for decisions.
+- The receiver estimates `h_hat` from the known preamble and applies one-tap equalization with `received / h_hat`.
+- The true fading coefficient may be recorded only for diagnostic `channel_estimation_error`.
+- End-to-end Rayleigh mode at `snr=18`, `seed=2026`, `mod=qpsk` should run successfully and should recover `Test.txt` under the documented high-SNR verification setting.
+- `results/rayleigh_received.txt` matches `Test.txt`.
+- `results/rayleigh_metrics.json` records `channel=rayleigh`, `text_match_rate=1.0`, `checksum_pass=true`, and `ber=0.0`.
+- After saving Rayleigh artifacts, rerun the AWGN fixed command so final `results/metrics.json` and `results/received.txt` remain the default AWGN outputs.
+
+Required cleanup verification:
+
+```bash
+git checkout -- Test.txt
+python main.py --input Test.txt --output results/received.txt --snr 12 --seed 2026 --mod qpsk --channel awgn
+python main.py --input Test.txt --output results/rayleigh_received.txt --snr 18 --seed 2026 --mod qpsk --channel rayleigh
+python main.py --input Test.txt --output results/received.txt --snr 12 --seed 2026 --mod qpsk --channel awgn
+python -m pytest tests -q
+python -m pytest public_tests -q
+```
+
+`public_tests/` should be run in a temporary sandbox copy because its fixture can rewrite `Test.txt`.
+
+## 13. Level 3 GUI Extension Verification
+
+The optional GUI is launched with:
+
+```bash
+python gui.py
+```
+
+Automated non-interactive checks:
+
+- `python -m py_compile gui.py`
+- Import `gui.py` and create a hidden Tkinter root to confirm the window can initialize.
+- Confirm initialization does not run the pipeline or modify results.
+
+Manual GUI checks:
+
+- Start with default AWGN values and run the simulation.
+- Confirm `results/received.txt` matches `Test.txt`.
+- Confirm displayed metrics show `channel=awgn`, `text_match_rate=1.0`, `checksum_pass=true`, and `ber=0.0`.
+- Confirm the plot tabs display or point to `constellation.png`, `ber_curve.png`, `system_ber_curve.png`, and `sync_peak.png`.
+- Switch to Rayleigh with SNR `18` and output `results/rayleigh_received.txt`; confirm successful recovery.
+- Enter a missing input path and confirm the GUI reports an error without crashing.
+
+Compatibility checks:
+
+- `main.py` CLI behavior remains unchanged.
+- `src.pipeline.run_pipeline(...)` remains the single execution API used by both CLI and GUI.
+- No extra dependency is added to `requirements.txt`; the GUI uses standard-library Tkinter.
+- GUI tests are intentionally lightweight because CI or hidden grading environments may not provide a graphical display. The required tests verify that `gui.py` compiles and can be imported without creating a Tk root window at import time. The GUI remains optional and does not affect the CLI grading path.
+
+## 14. Level 3 Final Hardening Tests
+
+Additional regression tests protect hidden-test style risks:
+
+- AWGN `seed=126`, `snr=12`, with the known previous sync failure is recovered exactly.
+- Multiple seeds and multiple Chinese UTF-8 text lengths recover exactly under AWGN at `snr=12`.
+- Low SNR writes `received.txt` and `metrics.json` without crashing, even when recovery fails.
+- Rayleigh CLI at `snr=18`, `seed=2026` uses `equalization=preamble_one_tap` and recovers the input text.
+- `gui.py` compiles and can be imported without creating a Tk root at import time.
+- `metrics.json` retains all required fields plus diagnostic sync and Rayleigh fields.
+- System BER curve tests verify that `system_ber_curve.png` is generated when the system BER sweep is enabled, that the number of BER values matches the configured SNR list, that all BER values lie in `[0, 1]`, and that generating the sweep does not overwrite the official `results/received.txt` and `results/metrics.json` for the fixed grading command.
+
+Required commands after this hardening:
+
+```bash
+python -m pytest tests -q
+python -m pytest public_tests -q
+python main.py --input Test.txt --output results/received.txt --snr 12 --seed 2026 --mod qpsk --channel awgn
+python main.py --input Test.txt --output results/rayleigh_received.txt --snr 18 --seed 2026 --mod qpsk --channel rayleigh
+```

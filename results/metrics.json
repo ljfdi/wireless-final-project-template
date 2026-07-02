@@ -1,8 +1,10 @@
 {
   "ber": 0.0,
+  "ber_curve_type": "uncoded_reference_and_end_to_end_system",
   "channel": "awgn",
   "checksum_pass": true,
   "coded_payload_bits": 18384,
+  "equalization": "none",
   "failure_reason": "",
   "fer": 0.0,
   "frame_bits": 18544,
@@ -10,8 +12,68 @@
   "payload_bits": 6128,
   "seed": 2026,
   "snr_db": 12.0,
+  "sync_candidates_parseable": 33,
+  "sync_candidates_tried": 65,
+  "sync_coarse_start_index": 109,
   "sync_error_symbols": 0,
+  "sync_search_radius": 32,
   "sync_start_index": 109,
   "sync_true_offset": 109,
+  "system_ber_checksum_pass_rates": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.3333333333333333,
+    0.6666666666666666,
+    1.0,
+    1.0
+  ],
+  "system_ber_curve_path": "results/system_ber_curve.png",
+  "system_ber_frame_success_rates": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.3333333333333333,
+    0.6666666666666666,
+    1.0,
+    1.0
+  ],
+  "system_ber_seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "system_ber_snr_values": [
+    0.0,
+    2.0,
+    4.0,
+    6.0,
+    8.0,
+    10.0,
+    12.0,
+    14.0
+  ],
+  "system_ber_text_match_rates": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "system_ber_values": [
+    0.17640339425587467,
+    0.15856179286335945,
+    0.28949086161879894,
+    0.29264577893820715,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
   "text_match_rate": 1.0
 }

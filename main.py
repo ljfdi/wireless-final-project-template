@@ -10,14 +10,14 @@ from src.pipeline import run_pipeline
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run the QPSK/AWGN wireless communication simulation."
+        description="Run the QPSK wireless communication simulation."
     )
     parser.add_argument("--input", dest="input_path", required=True, help="Input UTF-8 text file")
     parser.add_argument("--output", dest="output_path", required=True, help="Recovered text output file")
     parser.add_argument("--snr", dest="snr_db", type=float, default=12.0, help="SNR in dB")
     parser.add_argument("--seed", dest="seed", type=int, default=2026, help="Random seed")
     parser.add_argument("--mod", dest="modulation", choices=["qpsk"], default="qpsk")
-    parser.add_argument("--channel", dest="channel", choices=["awgn"], default="awgn")
+    parser.add_argument("--channel", dest="channel", choices=["awgn", "rayleigh"], default="awgn")
     return parser
 
 

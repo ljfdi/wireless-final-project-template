@@ -19,7 +19,7 @@ REQUIRED_METRIC_FIELDS = {
     "sync_start_index",
 }
 
-REQUIRED_PLOTS = ["constellation.png", "ber_curve.png", "sync_peak.png"]
+REQUIRED_PLOTS = ["constellation.png", "ber_curve.png", "system_ber_curve.png", "sync_peak.png"]
 
 
 def test_required_cli_contract_exists_and_runs(project_root):
@@ -46,6 +46,9 @@ def test_metrics_json_contains_required_fields_after_cli(project_root):
     assert metrics_path.exists(), "results/metrics.json should be generated"
     metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
     assert REQUIRED_METRIC_FIELDS <= set(metrics)
+    assert metrics["system_ber_curve_path"].endswith("results/system_ber_curve.png")
+    assert len(metrics["system_ber_values"]) == len(metrics["system_ber_snr_values"])
+    assert all(0.0 <= float(value) <= 1.0 for value in metrics["system_ber_values"])
 
 
 def test_required_plots_generate_after_cli(project_root):
@@ -61,7 +64,7 @@ def test_required_plots_generate_after_cli(project_root):
         for name in REQUIRED_PLOTS
         if (path := project_root / "results" / name).exists() and path.stat().st_size > 0
     ]
-    assert len(existing) >= 2
+    assert len(existing) >= 3
 
 
 def test_future_anti_copy_and_anti_hardcoding_check(project_root):
