@@ -19,7 +19,7 @@ This stage creates or updates only:
 - `DESIGN.md`
 - `TEST_PLAN.md`
 - `AI_LOG.md`
-- `无线通信技术期末项目报告模板.docx`, copied into the repository root because the template existed outside the cloned repository
+- Course report template document, copied into the repository root because the template existed outside the cloned repository
 
 This stage does not create or modify `main.py`, `src/`, `tests/`, `results/`, `public_tests/`, `Test.txt`, or `requirements.txt`.
 
@@ -81,7 +81,7 @@ AI actions:
 - Re-read the relevant Superpowers execution and verification instructions.
 - Checked git status and confirmed the branch was clean before document edits.
 - Confirmed the three Markdown documents and report template were missing from the repository root.
-- Copied `无线通信技术期末项目报告模板.docx` from the parent workspace into the repository root.
+- Copied the course report template document from the parent workspace into the repository root.
 - Created `DESIGN.md`.
 - Created `TEST_PLAN.md`.
 - Created this `AI_LOG.md`.
@@ -101,7 +101,7 @@ AI actions:
 - `grading/summarize_public_tests.py`
 - `.github/workflows/grading.yml`
 - `.github/pull_request_template.md`
-- Parent workspace report template: `无线通信技术期末项目报告模板.docx`
+- Parent workspace report template document
 - Superpowers skill notes for planning, execution, TDD, debugging, and verification
 - OpenSpec skill notes for explore/propose behavior
 

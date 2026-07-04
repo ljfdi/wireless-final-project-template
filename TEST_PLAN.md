@@ -408,7 +408,7 @@ python main.py --input Test.txt --output results/received.txt --snr 12 --seed 20
 python main.py --input Test.txt --output results/rayleigh_received.txt --snr 18 --seed 2026 --mod qpsk --channel rayleigh
 ```
 
-## 16. Classroom Review Hardening Checks
+## 15. Classroom Review Hardening Checks
 
 The classroom review emphasized that final projects should answer three engineering questions: what was transmitted, how many errors occurred, and why errors occurred. The final hardening test set therefore adds checks beyond the public tests:
 
