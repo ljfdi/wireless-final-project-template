@@ -9,7 +9,7 @@ The project now includes the implemented CLI pipeline, source modules, tests, re
 Current final verification:
 
 - `python -m pytest public_tests -q`: `22 passed`.
-- `python -m pytest tests -q`: `27 passed` after the system BER curve regression tests were added.
+- `python -m pytest tests -q`: `34 passed` after the classroom-review hardening regressions were added.
 - Fixed AWGN CLI run: `text_match_rate=1.0`, `checksum_pass=true`, `ber=0.0`.
 
 Historical initial stage record: Phase 1 design-document stage.
@@ -917,7 +917,7 @@ Performance note:
 
 Final verification:
 
-- `python -m pytest tests -q`: `27 passed`.
+- At the system BER curve extension stage, `python -m pytest tests -q`: `27 passed`.
 - `python -m pytest public_tests -q` in a temporary sandbox copy: `22 passed`.
 - Fixed AWGN CLI command exited successfully.
 - `results/received.txt` matches `Test.txt` exactly.
@@ -996,3 +996,29 @@ Adoption rationale:
 
 - The classroom review emphasized hidden tests that change text, SNR, seed, synchronization offset, file paths, and invalid parameters.
 - These changes strengthen the repository against those checks while keeping the communication chain explainable and preserving the official grading entry.
+
+## Classroom Review Hidden-Test Simulation Update
+
+User prompt summary:
+
+- Compare the repository against the teacher's classroom scoring notes and common failure categories.
+- Pay special attention to invalid SNR, invalid modulation, mixed English/Chinese/emoji payloads, payload bit counts, padding safety, low-SNR behavior, multiple seeds, and evidence in `metrics.json` and plots.
+- Simulate hidden tests locally with at least 60 cases, but do not commit the temporary simulation harness.
+
+AI changes and checks:
+
+- Replaced the classroom-review UTF-8 regression sample with real mixed Chinese/English/emoji text instead of mojibake-looking text.
+- Added a permanent CLI regression test for unsupported modulation such as `bpsk`.
+- Added a payload-bit assertion showing that `payload_bits` equals the UTF-8 byte length multiplied by 8.
+- Ran a temporary local hidden-test simulation outside the repository.
+
+Temporary hidden-test simulation result:
+
+- Total simulated cases: `77`.
+- Failure count: `0`.
+- Coverage included empty text, mixed English/Chinese/emoji text, long text, AWGN SNR values `6`, `8`, `12`, and `15`, Rayleigh SNR `18`, multiple seeds including `126` and `2026`, missing input, invalid SNR, invalid modulation, finite low-SNR non-crash behavior, and custom output directories.
+
+Adoption rationale:
+
+- The temporary simulation directly mirrors the classroom warning that public tests cover only part of the grading surface.
+- The permanent regression tests keep the most important edge cases in the submitted project, while the broad temporary harness remains a local confidence check rather than extra submitted scaffolding.

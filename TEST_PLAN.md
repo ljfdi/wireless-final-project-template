@@ -9,7 +9,7 @@ The earlier Phase 1/Phase 2 entries are preserved as process records for the req
 Final hardening result:
 
 - `python -m pytest public_tests -q`: `22 passed`.
-- `python -m pytest tests -q`: `27 passed` after the system BER curve regression tests were added. Earlier `25 passed` entries are historical records from before the system BER extension.
+- `python -m pytest tests -q`: `34 passed` after the classroom-review hardening regressions were added. Earlier `27 passed` and `25 passed` entries are historical records from before later hardening steps.
 - Fixed AWGN CLI run: `text_match_rate=1.0`, `checksum_pass=true`, `ber=0.0`.
 
 ## 2. Test Environment and Commands
@@ -413,11 +413,13 @@ python main.py --input Test.txt --output results/rayleigh_received.txt --snr 18 
 The classroom review emphasized that final projects should answer three engineering questions: what was transmitted, how many errors occurred, and why errors occurred. The final hardening test set therefore adds checks beyond the public tests:
 
 - CLI rejects non-finite SNR values: `nan`, `inf`, and `-inf`.
+- CLI rejects unsupported modulation such as `bpsk` with an explicit `invalid choice` error from `argparse`.
 - Finite low-SNR values remain valid stress inputs and should not crash the program.
 - Mixed UTF-8 text with Chinese, English, punctuation, numbers, and emoji round-trips under AWGN at the grading SNR.
 - Empty text and longer UTF-8 text round-trip without padding or decode errors.
 - Custom output directories receive `received.txt`, `metrics.json`, and plot artifacts.
 - The optional HTML dashboard compiles, imports without starting a server, reports input/output text comparison, and serves generated PNG plots.
+- A temporary local hidden-test simulation, not committed as project code, covers 77 cases across mixed texts, empty text, long text, AWGN SNR values `6`, `8`, `12`, and `15`, Rayleigh SNR `18`, multiple seeds including `126` and `2026`, missing input, invalid SNR, invalid modulation, low-SNR non-crash behavior, and custom output directories.
 
 Expected final verification after this hardening:
 

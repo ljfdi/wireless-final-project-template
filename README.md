@@ -194,6 +194,8 @@ The final repository was hardened around the three questions emphasized in the c
 
 Additional hidden-test style checks cover mixed Chinese/English/emoji UTF-8 text, empty text, long text, multiple seeds, low SNR non-crash behavior, custom output directories, and invalid SNR rejection. Non-finite SNR values such as `nan`, `inf`, and `-inf` are rejected before the channel model runs, while finite low SNR values remain valid stress-test inputs.
 
+A local hidden-test simulation was also run outside the repository and is not submitted as project code. It covered 77 cases, including mixed Chinese/English/emoji payloads, empty text, long text, AWGN SNR values `6`, `8`, `12`, and `15`, Rayleigh SNR `18`, multiple seeds including `126` and `2026`, missing input, invalid SNR, invalid modulation, low-SNR non-crash behavior, and custom output directories. The simulation completed with zero failures.
+
 ## Optional HTML Dashboard
 
 The project also includes a browser-based demonstration dashboard:

@@ -42,13 +42,46 @@ def test_cli_rejects_non_finite_snr_values(project_root, tmp_path):
         assert "finite" in result.stderr.lower() or "invalid snr" in result.stderr.lower()
 
 
+def test_cli_rejects_unsupported_modulation_with_clear_error(project_root, tmp_path):
+    input_path = tmp_path / "input.txt"
+    output_path = tmp_path / "received.txt"
+    _write_text(input_path, "invalid modulation should be rejected by the CLI")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(project_root / "main.py"),
+            "--input",
+            str(input_path),
+            "--output",
+            str(output_path),
+            "--snr",
+            "12",
+            "--seed",
+            "2026",
+            "--mod",
+            "bpsk",
+            "--channel",
+            "awgn",
+        ],
+        cwd=project_root,
+        text=True,
+        capture_output=True,
+        timeout=20,
+    )
+
+    assert result.returncode != 0
+    assert "invalid choice" in result.stderr.lower()
+    assert "bpsk" in result.stderr.lower()
+
+
 def test_utf8_emoji_empty_and_long_texts_round_trip(project_root, tmp_path):
     from src.pipeline import run_pipeline
 
     cases = [
         ("empty.txt", ""),
-        ("mixed_utf8.txt", "无线通信 QPSK/AWGN ✅ emoji 🚀 punctuation !? seed=2026"),
-        ("long_utf8.txt", "传了什么、错了多少、为什么会错。" * 40),
+        ("mixed_utf8.txt", "Wireless 通信 mix: QPSK/AWGN, emoji=📡🚀✅, punctuation!? seed=2026"),
+        ("long_utf8.txt", "传了什么、错了多少、为什么会错。Wireless payload 📶 " * 40),
     ]
 
     for index, (filename, text) in enumerate(cases):
@@ -67,6 +100,7 @@ def test_utf8_emoji_empty_and_long_texts_round_trip(project_root, tmp_path):
         )
 
         assert output_path.read_text(encoding="utf-8") == text
+        assert metrics["payload_bits"] == len(text.encode("utf-8")) * 8
         assert metrics["text_match_rate"] == 1.0
         assert metrics["checksum_pass"] is True
         assert metrics["ber"] == 0.0

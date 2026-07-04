@@ -7,7 +7,7 @@ This report preserves the RED/GREEN TDD process required by the project workflow
 Final verification:
 
 - `python -m pytest public_tests -q`: `22 passed`.
-- `python -m pytest tests -q`: `27 passed` after the system BER curve regression tests were added. Earlier `25 passed` and `17 passed` entries below are historical stage records.
+- `python -m pytest tests -q`: `34 passed` after the classroom-review hardening regressions were added. Earlier `27 passed`, `25 passed`, and `17 passed` entries below are historical stage records.
 - Fixed AWGN CLI run: `text_match_rate=1.0`, `checksum_pass=true`, `ber=0.0`.
 
 ## 1. Phase 2 Scope
@@ -349,11 +349,13 @@ The teacher's classroom review emphasized that hidden tests check whether the sy
 New or reinforced scenarios:
 
 - Invalid SNR: `nan`, `inf`, and `-inf` must be rejected at the CLI instead of entering the channel model.
+- Invalid modulation: unsupported modes such as `bpsk` must be rejected by the CLI with a clear `argparse` error instead of silently running an undefined modulation path.
 - UTF-8 generality: mixed Chinese, English, punctuation, numbers, and emoji text must recover exactly.
 - Empty and long text: source coding, length fields, padding removal, and UTF-8 decoding must still be consistent.
 - Custom output path: metrics and generated plots must be written beside the requested output file.
 - Evidence chain: `metrics.json` and plots must support the explanation of what was transmitted, how many errors occurred, and why errors may occur.
 - HTML dashboard: optional browser GUI must show input/output text comparison, metric cards, and generated plots without affecting `main.py`.
+- Local hidden-test simulation: a temporary non-submitted harness ran 77 cases over mixed text, empty text, long text, AWGN SNR `6/8/12/15`, Rayleigh SNR `18`, multiple seeds including `126` and `2026`, missing input, invalid SNR, invalid modulation, low-SNR non-crash behavior, and custom output directories. The simulation reported zero failures.
 
 TDD result:
 
