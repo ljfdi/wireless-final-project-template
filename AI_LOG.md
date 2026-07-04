@@ -968,3 +968,31 @@ Adoption rationale:
 
 - The reference BER curve explains modulation-layer behavior.
 - The system BER curve better reflects the actual coded file-transmission chain.
+
+## Classroom Review Hardening Update
+
+User prompt summary:
+
+- Use the teacher's classroom review summary to harden the final repository before submission.
+- Focus on hidden-test robustness, CLI parameter validation, UTF-8/emoji recovery, result evidence, and GUI presentation.
+- Keep the official CLI entry unchanged and preserve existing Level 3 features.
+
+AI changes:
+
+- Added finite-SNR validation in `main.py` and `src/pipeline.py`.
+- Rejected non-finite SNR values such as `nan`, `inf`, and `-inf` before the channel model runs.
+- Kept finite low-SNR values valid as stress-test inputs.
+- Added `tests/test_teacher_review_hardening.py` for invalid SNR, mixed UTF-8/emoji, empty text, long text, and custom output directories.
+- Documented the classroom-review evidence chain in `README.md`, `TEST_PLAN.md`, and `MOCK_TEST_REPORT.md`.
+- Preserved the official command-line interface, public-test behavior, Rayleigh extension, GUI, and result artifacts.
+
+TDD and debugging record:
+
+- RED: the new invalid-SNR test initially failed because `--snr nan` entered the full pipeline and returned a receiver failure instead of a clear CLI error.
+- GREEN: CLI parsing now rejects non-finite SNR values with an explicit finite-number error, and pipeline-level validation protects direct API calls.
+- The hardening tests then passed without weakening any existing tests.
+
+Adoption rationale:
+
+- The classroom review emphasized hidden tests that change text, SNR, seed, synchronization offset, file paths, and invalid parameters.
+- These changes strengthen the repository against those checks while keeping the communication chain explainable and preserving the official grading entry.

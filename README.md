@@ -183,3 +183,31 @@ BER curve notes:
 - `results/system_ber_curve.png` contains only the complete end-to-end system BER-SNR curve.
 - The system BER curve is computed by running the full pipeline over multiple SNR values and seeds, including source coding, scrambling, repetition coding, framing, QPSK, AWGN, synchronization, decoding, descrambling, source decoding, and checksum/metrics calculation.
 - The BER sweep uses temporary outputs and does not overwrite the formal `results/received.txt` or final `results/metrics.json`.
+
+## Final Hardening Notes After Classroom Review
+
+The final repository was hardened around the three questions emphasized in the classroom review:
+
+- What was transmitted: UTF-8 text from the configured input file, converted to bits, scrambled, repetition-coded, framed, QPSK-modulated, sent through AWGN/Rayleigh, synchronized, decoded, descrambled, and restored as text.
+- How many errors occurred: `metrics.json` records `ber`, `fer`, `text_match_rate`, `checksum_pass`, `payload_bits`, and synchronization diagnostics.
+- Why errors occur: low SNR, Rayleigh deep fading, ambiguous preamble correlation, checksum failure, or UTF-8 decode failure are recorded through metrics such as `failure_reason`, `sync_error_symbols`, and Rayleigh channel-estimation diagnostics.
+
+Additional hidden-test style checks cover mixed Chinese/English/emoji UTF-8 text, empty text, long text, multiple seeds, low SNR non-crash behavior, custom output directories, and invalid SNR rejection. Non-finite SNR values such as `nan`, `inf`, and `-inf` are rejected before the channel model runs, while finite low SNR values remain valid stress-test inputs.
+
+## Optional HTML Dashboard
+
+The project also includes a browser-based demonstration dashboard:
+
+```bash
+python web_gui.py --port 8010
+```
+
+Open:
+
+```text
+http://127.0.0.1:8010/
+```
+
+The dashboard shows the same pipeline through a visual interface: input/output text comparison, MATCH/DIFFER status, BER/FER/checksum/synchronization metric cards, Rayleigh equalization diagnostics, four generated plots, and a short communication-chain explanation. It is optional and does not replace `main.py`.
+
+If port `8000` is occupied or the browser shows an HTTP/HTTPS `Bad Request`, choose another port such as `8010`.

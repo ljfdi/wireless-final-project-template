@@ -2,6 +2,7 @@ from __future__ import annotations
 
 """End-to-end wireless baseband simulation pipeline."""
 
+import math
 from pathlib import Path
 import tempfile
 
@@ -95,6 +96,9 @@ def run_pipeline(
         raise ValueError("Only qpsk modulation is supported")
     if channel_name not in {"awgn", "rayleigh"}:
         raise ValueError("Only awgn and rayleigh channels are supported")
+    snr_value = float(snr_db)
+    if not math.isfinite(snr_value):
+        raise ValueError("invalid SNR: value must be finite")
 
     input_file = Path(input_path)
     output_file = Path(output_path)
@@ -122,11 +126,11 @@ def run_pipeline(
     transmitted_symbols = np.concatenate([prefix, frame_symbols])
     true_fading: complex | None = None
     if channel_name == "awgn":
-        received_symbols = awgn(transmitted_symbols, snr_db=float(snr_db), seed=seed)
+        received_symbols = awgn(transmitted_symbols, snr_db=snr_value, seed=seed)
     else:
         received_symbols, true_fading = rayleigh(
             transmitted_symbols,
-            snr_db=float(snr_db),
+            snr_db=snr_value,
             seed=seed,
             return_channel=True,
         )
@@ -296,7 +300,7 @@ def run_pipeline(
         failure_reason = _append_failure(failure_reason, plot_failure)
 
     metrics = build_metrics(
-        snr_db=float(snr_db),
+        snr_db=snr_value,
         seed=int(seed),
         modulation=modulation_name,
         channel=channel_name,
@@ -353,6 +357,8 @@ def compute_system_ber_curve(
     metrics.json files.
     """
     snr_list = [float(value) for value in (snr_values or SYSTEM_BER_SNR_VALUES)]
+    if any(not math.isfinite(value) for value in snr_list):
+        raise ValueError("invalid SNR sweep value: all SNR values must be finite")
     seed_list = [int(value) for value in (seeds or SYSTEM_BER_SEEDS)]
     temp_parent = Path(temp_root) if temp_root is not None else Path(input_path).resolve().parent
     temp_parent.mkdir(parents=True, exist_ok=True)

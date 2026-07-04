@@ -407,3 +407,24 @@ python -m pytest public_tests -q
 python main.py --input Test.txt --output results/received.txt --snr 12 --seed 2026 --mod qpsk --channel awgn
 python main.py --input Test.txt --output results/rayleigh_received.txt --snr 18 --seed 2026 --mod qpsk --channel rayleigh
 ```
+
+## 16. Classroom Review Hardening Checks
+
+The classroom review emphasized that final projects should answer three engineering questions: what was transmitted, how many errors occurred, and why errors occurred. The final hardening test set therefore adds checks beyond the public tests:
+
+- CLI rejects non-finite SNR values: `nan`, `inf`, and `-inf`.
+- Finite low-SNR values remain valid stress inputs and should not crash the program.
+- Mixed UTF-8 text with Chinese, English, punctuation, numbers, and emoji round-trips under AWGN at the grading SNR.
+- Empty text and longer UTF-8 text round-trip without padding or decode errors.
+- Custom output directories receive `received.txt`, `metrics.json`, and plot artifacts.
+- The optional HTML dashboard compiles, imports without starting a server, reports input/output text comparison, and serves generated PNG plots.
+
+Expected final verification after this hardening:
+
+```bash
+python -m pytest public_tests -q
+python -m pytest tests -q
+python main.py --input Test.txt --output results/received.txt --snr 12 --seed 2026 --mod qpsk --channel awgn
+```
+
+The fixed AWGN CLI output should still recover `Test.txt` exactly with `ber=0.0`, `fer=0.0`, `text_match_rate=1.0`, and `checksum_pass=true`.

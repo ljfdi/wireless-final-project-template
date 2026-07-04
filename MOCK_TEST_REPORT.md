@@ -341,3 +341,22 @@ Expected behavior:
 
 - BER generally improves as SNR increases, though finite seeds and sync failures can create small non-monotonic points.
 - At BER=0, plotting uses a display floor only; the raw metrics still keep true `0.0` values.
+
+## 11. Classroom Review Hardening Addendum
+
+The teacher's classroom review emphasized that hidden tests check whether the system remains reusable under changed text, SNR, seed, synchronization offset, file path, and invalid input conditions. The repository was therefore extended with a final hardening test group.
+
+New or reinforced scenarios:
+
+- Invalid SNR: `nan`, `inf`, and `-inf` must be rejected at the CLI instead of entering the channel model.
+- UTF-8 generality: mixed Chinese, English, punctuation, numbers, and emoji text must recover exactly.
+- Empty and long text: source coding, length fields, padding removal, and UTF-8 decoding must still be consistent.
+- Custom output path: metrics and generated plots must be written beside the requested output file.
+- Evidence chain: `metrics.json` and plots must support the explanation of what was transmitted, how many errors occurred, and why errors may occur.
+- HTML dashboard: optional browser GUI must show input/output text comparison, metric cards, and generated plots without affecting `main.py`.
+
+TDD result:
+
+- RED: `test_cli_rejects_non_finite_snr_values` initially failed because `--snr nan` entered the full pipeline and returned a receiver failure instead of a clear CLI error.
+- GREEN: CLI SNR parsing now rejects non-finite values with an explicit finite-number error, while finite low-SNR values remain valid stress tests.
+- Regression coverage: `tests/test_teacher_review_hardening.py` and `tests/test_web_gui.py` cover the classroom-review risks and HTML dashboard behavior.
